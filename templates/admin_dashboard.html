@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - BokoHacks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('admin.logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Welcome, {{ session['admin_username'] }}</h2>
+        <p>Manage Users and System Settings</p>
+        
+        <section>
+            <h3>Manage Users</h3>
+            <a href="{{ url_for('admin.get_users') }}">View All Users</a>
+        </section>
+    </main>
+</body>
+</html>

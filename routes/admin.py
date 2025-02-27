@@ -261,10 +261,59 @@ def add_user():
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)})
 
-@admin_bp.route('/admin/logout', methods=['POST'])
+# @admin_bp.route('/admin/logout', methods=['POST'])
+# def logout():
+#     # gets rid of all admin id on log out 
+#     session.pop('admin_logged_in', None)
+#     session.pop('admin_username', None)
+#     session.pop('is_default_admin', None)
+#     return jsonify({"success": True, "message": "Logged out successfully"})
+
+@admin_bp.route('/admin/logout', methods=['GET', 'POST'])
 def logout():
-    # gets rid of all admin id on log out 
+    """Logs out the admin and redirects to home page"""
     session.pop('admin_logged_in', None)
     session.pop('admin_username', None)
     session.pop('is_default_admin', None)
-    return jsonify({"success": True, "message": "Logged out successfully"})
+
+    return redirect(url_for('home.home'))
+
+
+@admin_bp.route("/admin-login", methods=["GET", "POST"])
+def admin_login():
+    """Admin Login Page"""
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            admin_role = Admin.query.filter_by(user_id=user.id).first()
+            
+            if admin_role:
+                session["admin_logged_in"] = True
+                session["admin_username"] = username
+                session["is_default_admin"] = admin_role.is_default
+                
+                return redirect(url_for("admin.admin_dashboard"))  # Redirect admins to their dashboard
+            
+        return render_template("admin_login.html", error="Invalid admin credentials.")
+
+    return render_template("admin_login.html")
+
+@admin_bp.route("/admin-dashboard")
+def admin_dashboard():
+    """Secure Admin Dashboard"""
+    if not session.get("admin_logged_in"):
+        flash("Unauthorized access!", "error")
+        return redirect(url_for("admin.admin_login"))
+
+    return render_template("admin_dashboard.html")
+
+@admin_bp.before_request
+def restrict_admin_access():
+    """Ensure only admins can access admin routes"""
+    admin_routes = ["/admin-dashboard", "/admin/add", "/admin/remove/<int:admin_id>", "/admin/users"]
+    if request.path in admin_routes and not session.get("admin_logged_in"):
+        flash("Unauthorized access!", "error")
+        return redirect(url_for("admin.admin_login"))
