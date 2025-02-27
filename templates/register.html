@@ -4,6 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <script>
+  function togglePassword() {
+    let passwordInput = document.getElementById("password");
+    let eyeIcon = document.getElementById("eye-icon");
+
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      eyeIcon.classList.remove("fa-eye-slash");
+      eyeIcon.classList.add("fa-eye"); // Open eye when showing password
+    } else {
+      passwordInput.type = "password";
+      eyeIcon.classList.remove("fa-eye");
+      eyeIcon.classList.add("fa-eye-slash"); // Closed eye when hiding password
+    }
+  }
+</script>
   <title>Register - BokoHacks</title>
 </head>
 <body>
@@ -36,7 +53,12 @@
         <input type="text" id="username" name="username" placeholder="Choose a username" required>
         
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Create a password" required>
+        <div class="password-container">
+          <input type="password" id="password" name="password" placeholder="Create a password" required>
+          <span class="toggle-password" onclick="togglePassword()">
+            <i id="eye-icon" class="fas fa-eye-slash"></i> <!-- Default: Closed eye -->
+          </span>
+        </div>        
         <ul id="password-requirements">
           <li id="length" class="invalid">At least 8 characters</li>
           <li id="uppercase" class="invalid">At least one uppercase letter (A-Z)</li>
@@ -123,6 +145,23 @@
     updateRequirement("digit", digit.test(password), "At least one digit (0-9)");
     updateRequirement("special", special.test(password), "At least one special character (@, #, $, etc.)");
   }
-</script>  
+</script> 
+
+<script>
+  function togglePassword() {
+    let passwordInput = document.getElementById("password");
+    let eyeIcon = document.getElementById("eye-icon");
+
+    if (passwordInput.type === "password") {
+      passwordInput.type = "text";
+      eyeIcon.classList.remove("fa-eye-slash");
+      eyeIcon.classList.add("fa-eye"); // Open eye when showing password
+    } else {
+      passwordInput.type = "password";
+      eyeIcon.classList.remove("fa-eye");
+      eyeIcon.classList.add("fa-eye-slash"); // Closed eye when hiding password
+    }
+  }
+</script>
 </body>
 </html>
