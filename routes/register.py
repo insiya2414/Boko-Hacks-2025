@@ -1,8 +1,30 @@
+import re
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from models.user import User
 from extensions import db
 
 register_bp = Blueprint("register", __name__)
+
+def is_valid_password(password):
+    """Checks if the password meets all security criteria."""
+    
+    # At least 8 characters long
+    if len(password) < 8:
+        return "Password must be at least 8 characters long."
+
+    # At least one uppercase letter
+    if not any(char.isupper() for char in password):
+        return "Password must contain at least one uppercase letter."
+
+    # At least one lowercase letter
+    if not any(char.islower() for char in password):
+        return "Password must contain at least one lowercase letter."
+
+    # At least one digit
+    if not any(char.isdigit() for char in password):
+        return "Password must contain at least one digit."
+
+    return None
 
 @register_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -81,6 +103,11 @@ def register():
             flash("Username already exists. Please choose a different one.", "error")
             return redirect(url_for("register.register"))
 
+        password_error = is_valid_password(password)
+        if password_error:
+            flash(password_error, "error")
+            return redirect(url_for("register.register"))
+        
         new_user = User(username=username)
         new_user.set_password(password)
         db.session.add(new_user)
