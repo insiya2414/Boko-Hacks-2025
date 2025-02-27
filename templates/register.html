@@ -67,12 +67,18 @@
           <li id="special" class="invalid">At least one special character (@, #, $, etc.)</li>
         </ul>
         
-        <label for="captcha">Enter CAPTCHA:</label>
+        <label>CAPTCHA:</label>
         <div class="captcha-box">
-          <img src="{{ url_for('captcha.get_captcha') }}" alt="CAPTCHA" class="captcha-image">
+          <p class="captcha-instructions">{{ session.get('captcha_instructions', 'Click on the cell where placing the symbol would create a winning line') }}</p>
+          <div class="ttt-captcha-container">
+          <img src="{{ url_for('captcha.get_captcha') }}" alt="TicTacToe CAPTCHA" class="captcha-image" id="ttt-captcha">
+          </div>
+          <input type="hidden" id="captcha_row" name="captcha_row" value="">
+          <input type="hidden" id="captcha_col" name="captcha_col" value="">
+          <button type="button" id="refresh-captcha">Refresh CAPTCHA</button>
         </div>
-        <input type="text" id="captcha" name="captcha" placeholder="Enter the text shown above" required>
-        
+        <!-- <input type="text" id="captcha" name="captcha" placeholder="Enter the text shown above" required> -->
+
         <button type="submit">Register</button>
       </form>
       <p>Already have an account? <a href="{{ url_for('login.login') }}">Login here</a>.</p>
@@ -81,6 +87,42 @@
   <footer>
     <p>&copy; 2025 BokoHacks | All Rights Reserved</p>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const captchaImg = document.getElementById('ttt-captcha');
+      const rowInput = document.getElementById('captcha_row');
+      const colInput = document.getElementById('captcha_col');
+      const refreshBtn = document.getElementById('refresh-captcha');
+      
+      // Handle click on the TicTacToe board
+      captchaImg.addEventListener('click', function(e) {
+        const rect = captchaImg.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Calculate which cell was clicked
+        const cellSize = captchaImg.width / 3; // Assuming 3x3 grid
+        const col = Math.floor(x / cellSize);
+        const row = Math.floor(y / cellSize);
+        
+        // Update hidden form inputs
+        rowInput.value = row;
+        colInput.value = col;
+        
+        // Visual feedback (optional)
+        alert(`Selected cell: row ${row}, column ${col}`);
+      });
+      
+      // Refresh the CAPTCHA when button is clicked
+      refreshBtn.addEventListener('click', function() {
+        captchaImg.src = '{{ url_for("captcha.get_captcha") }}?' + new Date().getTime();
+        rowInput.value = '';
+        colInput.value = '';
+      });
+    });
+  </script>
+
 
   <style>
     .captcha-box {
@@ -96,16 +138,33 @@
     .captcha-image {
       max-width: 200px;
       height: auto;
+      cursor: pointer;
     }
     
+    .ttt-captcha-container {
+      display: inline-block;
+      position: relative;
+    }
+
+    .captcha-instructions {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  form input[type="hidden"] {
+    display: none;
+  }
+
+/*     
     form input[type="text"]#captcha {
       width: 100%;
       padding: 0.75rem;
       margin-bottom: 1rem;
       border: 1px solid #cccccc;
       border-radius: 4px;
-      font-size: 1rem;
-    }
+      font-size: 1rem;} */
+  
   </style>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
