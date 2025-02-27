@@ -56,7 +56,7 @@
         <div class="password-container">
           <input type="password" id="password" name="password" placeholder="Create a password" required>
           <span class="toggle-password" onclick="togglePassword()">
-            <i id="eye-icon" class="fas fa-eye-slash"></i> <!-- Default: Closed eye -->
+            <i id="eye-icon" class="fa-solid fa-eye-slash"></i> <!-- Default: Closed eye -->
           </span>
         </div>        
         <ul id="password-requirements">
@@ -211,15 +211,24 @@
     let passwordInput = document.getElementById("password");
     let eyeIcon = document.getElementById("eye-icon");
 
+    // Add animation class
+    eyeIcon.classList.add("eye-animate");
+
+    // Toggle password visibility
     if (passwordInput.type === "password") {
       passwordInput.type = "text";
       eyeIcon.classList.remove("fa-eye-slash");
-      eyeIcon.classList.add("fa-eye"); // Open eye when showing password
+      eyeIcon.classList.add("fa-eye"); // Open eye
     } else {
       passwordInput.type = "password";
       eyeIcon.classList.remove("fa-eye");
-      eyeIcon.classList.add("fa-eye-slash"); // Closed eye when hiding password
+      eyeIcon.classList.add("fa-eye-slash"); // Closed eye
     }
+
+    // Remove animation class after animation completes (to allow re-triggering)
+    setTimeout(() => {
+      eyeIcon.classList.remove("eye-animate");
+    }, 300);
   }
 </script>
 </body>
