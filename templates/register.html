@@ -37,6 +37,13 @@
         
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" placeholder="Create a password" required>
+        <ul id="password-requirements">
+          <li id="length" class="invalid">At least 8 characters</li>
+          <li id="uppercase" class="invalid">At least one uppercase letter (A-Z)</li>
+          <li id="lowercase" class="invalid">At least one lowercase letter (a-z)</li>
+          <li id="digit" class="invalid">At least one digit (0-9)</li>
+          <li id="special" class="invalid">At least one special character (@, #, $, etc.)</li>
+        </ul>
         
         <label for="captcha">Enter CAPTCHA:</label>
         <div class="captcha-box">
@@ -78,5 +85,44 @@
       font-size: 1rem;
     }
   </style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    let passwordInput = document.getElementById("password");
+
+    passwordInput.addEventListener("input", function () {
+      validatePassword();
+    });
+  });
+
+  function validatePassword() {
+    let password = document.getElementById("password").value;
+
+    // Regex patterns
+    let uppercase = /[A-Z]/;
+    let lowercase = /[a-z]/;
+    let digit = /[0-9]/;
+    let special = /[!@#$%^&*(),.?":{}|<>]/;
+
+    function updateRequirement(elementId, condition, text) {
+      let element = document.getElementById(elementId);
+      if (condition) {
+        element.classList.remove("invalid");
+        element.classList.add("valid");
+        element.innerHTML = `✅ ${text}`;
+      } else {
+        element.classList.remove("valid");
+        element.classList.add("invalid");
+        element.innerHTML = `❌ ${text}`;
+      }
+    }
+
+    // Validate each requirement
+    updateRequirement("length", password.length >= 8, "At least 8 characters");
+    updateRequirement("uppercase", uppercase.test(password), "At least one uppercase letter (A-Z)");
+    updateRequirement("lowercase", lowercase.test(password), "At least one lowercase letter (a-z)");
+    updateRequirement("digit", digit.test(password), "At least one digit (0-9)");
+    updateRequirement("special", special.test(password), "At least one special character (@, #, $, etc.)");
+  }
+</script>  
 </body>
 </html>

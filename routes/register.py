@@ -24,23 +24,6 @@ def is_valid_password(password):
     if not any(char.isdigit() for char in password):
         return "Password must contain at least one digit."
 
-    # At least one special character
-    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-        return "Password must contain at least one special character (@, #, $, etc.)."
-
-    # At least one emoji
-    emoji_pattern = re.compile(
-        "[\U0001F600-\U0001F64F]|"
-        "[\U0001F300-\U0001F5FF]|"  
-        "[\U0001F680-\U0001F6FF]|" 
-        "[\U0001F700-\U0001F77F]|"  
-        "[\U0001F900-\U0001F9FF]",  
-        flags=re.UNICODE
-    )
-    
-    if not emoji_pattern.search(password):
-        return "Password must contain at least one emoji. 😊"
-
     return None
 
 @register_bp.route("/register", methods=["GET", "POST"])
