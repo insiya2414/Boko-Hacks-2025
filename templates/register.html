@@ -40,7 +40,7 @@
         
         <label>CAPTCHA:</label>
         <div class="captcha-box">
-          <p class="captcha-instructions">{{ session.get('captcha_instructions', 'Complete the CAPTCHA challenge') }}</p>
+          <p class="captcha-instructions">{{ session.get('captcha_instructions', 'Click on the cell where placing the symbol would create a winning line') }}</p>
           <div class="ttt-captcha-container">
           <img src="{{ url_for('captcha.get_captcha') }}" alt="TicTacToe CAPTCHA" class="captcha-image" id="ttt-captcha">
           </div>
@@ -72,20 +72,16 @@
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
         
-        // Calculate which cell was clicked based on the displayed image size
-        const imgWidth = captchaImg.clientWidth;
-        const imgHeight = captchaImg.clientHeight;
-        const cellWidth = imgWidth / 3;
-        const cellHeight = imgHeight / 3;
-        
-        const col = Math.floor(x / cellWidth);
-        const row = Math.floor(y / cellHeight);
+        // Calculate which cell was clicked
+        const cellSize = captchaImg.width / 3; // Assuming 3x3 grid
+        const col = Math.floor(x / cellSize);
+        const row = Math.floor(y / cellSize);
         
         // Update hidden form inputs
         rowInput.value = row;
         colInput.value = col;
         
-        // Visual feedback
+        // Visual feedback (optional)
         alert(`Selected cell: row ${row}, column ${col}`);
       });
       
@@ -97,6 +93,7 @@
       });
     });
   </script>
+
 
   <style>
     .captcha-box {
@@ -121,14 +118,24 @@
     }
 
     .captcha-instructions {
-      margin-bottom: 10px;
-      font-weight: bold;
-      color: #333;
-    }
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+  }
   
-    form input[type="hidden"] {
-      display: none;
-    }
+  form input[type="hidden"] {
+    display: none;
+  }
+
+/*     
+    form input[type="text"]#captcha {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      font-size: 1rem;} */
+  
   </style>
 </body>
 </html>

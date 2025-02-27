@@ -28,28 +28,48 @@ def register():
             captcha_col = request.form.get("captcha_col", type=int)
             
             # Check if captcha row/col were provided
-            if captcha_row is None or captcha_col is None:
+            if captcha_row is None or captcha_col is None or captcha_row == "" or captcha_col == "":
                 flash("Please complete the CAPTCHA challenge by clicking on a cell.", "error")
                 return redirect(url_for("register.register"))
             
-            # Get correct answer from session
-            correct_answer = session.get("captcha_answer")
-            if correct_answer is None:
+            # Get the stored data from session
+            stored_board = session.get("captcha_board")
+            winning_symbol = session.get("winning_symbol")
+            
+            if not stored_board or not winning_symbol:
                 flash("CAPTCHA session expired. Please try again.", "error")
                 return redirect(url_for("register.register"))
+                
+            # Check if this is a valid selection (empty cell)
+            if captcha_row < 0 or captcha_row >= 3 or captcha_col < 0 or captcha_col >= 3:
+                flash("Invalid CAPTCHA selection. Please try again.", "error")
+                return redirect(url_for("register.register"))
+                
+            if stored_board[captcha_row][captcha_col] != '':
+                flash("Selected cell is already occupied. Please try again.", "error")
+                return redirect(url_for("register.register"))
             
-            correct_row, correct_col = correct_answer
+            # Now check if this is a winning move
+            from utils.captcha import check_win
+            is_winning_move = check_win(stored_board, captcha_row, captcha_col, winning_symbol)
             
-            # Verify CAPTCHA
-            if captcha_row != correct_row or captcha_col != correct_col:
-                flash("Incorrect CAPTCHA. Please try again.", "error")
+            # Also check against the expected answer
+            correct_answer = session.get("captcha_answer")
+            direct_match = False
+            if correct_answer:
+                correct_row, correct_col = correct_answer
+                direct_match = (captcha_row == correct_row and captcha_col == correct_col)
+            
+            if not (is_winning_move or direct_match):
+                flash("Incorrect CAPTCHA solution. Please select a cell that would create a winning line.", "error")
                 return redirect(url_for("register.register"))
             
             # Clear CAPTCHA from session
             session.pop("captcha_answer", None)
+            session.pop("captcha_board", None)
             session.pop("winning_symbol", None)
             session.pop("captcha_instructions", None)
-        
+            
         else:
             # No CAPTCHA response found
             flash("Please complete the CAPTCHA challenge.", "error")
@@ -70,11 +90,6 @@ def register():
         return redirect(url_for("login.login"))
 
     return render_template("register.html")
-
-
-
-
-
 #old code IN CASE:
 # register_bp = Blueprint("register", __name__)
 
