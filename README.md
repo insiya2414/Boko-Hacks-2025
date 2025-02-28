@@ -18,6 +18,21 @@ Our Group's Application Security Challenge Platform for Texas State University's
 ## Overview 
 This project was a deliberately vulnerable web application created by Texas State University's BokoHacks committee, designed to help students learn about common web security vulnerabilities through hands-on practice. Our redesigned version remedies several challenges focusing on SQL injection, XSS (Cross-Site Scripting), access control flaws, and authentication bypass techniques. Our focus was to make sure the website was secure for regular users to traverse, adding both industry-standard and unique ways to strengthen authentication and accesses.
 
+## Security Issues Resolved
+- Randomized tic-tac-toe CAPTCHA is presented before registering an account, allowing a more unique and engaging way to prevent bots and recognize human interaction.
+- Removed backend vulnerabilities in the Notes Application that would garner an attack (SQLInjection/XSS Attack) and improving access control, ensuring that users can only view their own notes. 
+- Requires passwords to have at least 8 characters, including uppercase, lowercase, special characters, and digits
+- Secure Password Storage: Hashes passwords before storing them using secure algorithms like bcrypt or Argon2. This ensures that even if the database is compromised, passwords remain unreadable.
+- Protection Against SQL Injection: Uses SQLAlchemy ORM, which parameterizes queries and prevents direct execution of user input. This eliminates risks of malicious SQL code being injected to manipulate the database
+- Environment Variable for API Key: Loads API keys securely from .env files instead of hardcoding them in the codebase. This prevents accidental exposure in version control systems like Git
+- URL Prefix for Blueprint: Groups API routes under /apps/news, keeping endpoint organization structured and secure.
+- API Key Existence Check: Ensures an API key is present before making external API requests.
+- Timeout for API Requests: Sets a 10-second timeout on external API requests to prevent indefinite waiting, mitigate Denial of Service (DoS) attacks and unresponsive API endpoints.
+- Safe Data Extraction – Uses .get() instead of direct dictionary access to avoid KeyError crashes
+- Login Attempts Restricted: Does not allow brute force logins to avoid a non-authorized user to login
+- Prevents Arbitrary Account Resets: Ensures that only the logged-in user can reset their own account. This prevents attackers from resetting other users’ accounts maliciously. 
+- Rate Limiting: Uses Flask-Limiter to restrict repeated API calls, such as login attempts or balance checks. This helps prevent abuse, brute-force attacks, and API overuse.
+
 
 
 ## Requirements
