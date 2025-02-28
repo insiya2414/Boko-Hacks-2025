@@ -54,7 +54,6 @@ def get_balance():
     return jsonify(user_accounts[username])
 
 @retirement_bp.route("/contribute", methods=["POST"])
-@csrf.exempt  # Remove this if CSRF protection is enabled globally
 @limiter.limit("5 per minute")  # Prevents spamming contributions
 def contribute():
     if "user" not in session:
