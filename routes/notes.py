@@ -45,6 +45,14 @@ def create_note():
     if not title or not content:
         return jsonify({'success': False, 'error': 'Title and content are required'}), 400
     
+    #added to prevent large payloads (with a smartass error message)
+    MAX_CONTENT_LENGTH = 1000  # Set maximum content length to 1000 characters
+    if len(content) > MAX_CONTENT_LENGTH:
+        return jsonify({
+            'success': False, 
+            'error': 'HEY! Better not be putting too much on there! Keep your notes under 1000 characters!'
+        }), 413  # 413 Payload Too Large
+
     try:
         print(f"Creating note - Title: {title}, Content: {content}")
         
@@ -78,7 +86,7 @@ def create_note():
 
 @notes_bp.route('/search')
 def search_notes():
-    """Search notes with intentional SQL injection vulnerability"""
+    # """Search notes with intentional SQL injection vulnerability"""
     if 'user' not in session:
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
         
@@ -90,13 +98,18 @@ def search_notes():
     print(f"Search query: {query}")
     
     try:
-        sql = f"SELECT * FROM notes WHERE title LIKE '%{query}%' OR content LIKE '%{query}%'"
+        #USe parameterized query instead of string formatting
+        sql = text("SELECT * FROM notes WHERE (title LIKE :query OR content LIKE :query) AND user_id = :user_id")
+        #sql = f"SELECT * FROM notes WHERE title LIKE '%{query}%' OR content LIKE '%{query}%'"
         
         # Log the raw SQL for debugging
         print(f"Executing SQL: {sql}")
         
         # Execute the raw SQL
-        result = db.session.execute(text(sql))
+        result = db.session.execute(
+            sql,
+            {"query":  f"%{query}%", "user_id": current_user.id}
+            )
         
         notes = []
         for row in result:

@@ -90,10 +90,11 @@ def check_move():
     if not data:
         return jsonify({"success": False, "message": "No data provided"})
         
-    row = data.get("row")
-    col = data.get("col")
-    
-    if row is None or col is None:
+    # Convert to integers - important as JSON may send strings
+    try:
+        row = int(data.get("row"))
+        col = int(data.get("col"))
+    except (TypeError, ValueError):
         return jsonify({"success": False, "message": "Invalid coordinates"})
     
     # Get the stored board and winning symbol
@@ -113,25 +114,26 @@ def check_move():
     # Check if this is a winning move
     is_winning_move = check_win(stored_board, row, col, winning_symbol)
     
+    # Allow ANY winning move, not just the exact one we calculated
     if is_winning_move:
-        correct_answer = session.get("captcha_answer")
-        if correct_answer:
-            correct_row, correct_col = correct_answer
-            if row == correct_row and col == correct_col:
-                # Exact match with our expected solution
-                message = "Perfect! That's the winning move."
-            else:
-                # Found another winning move (edge case but possible)
-                message = "Nice! That's a winning move."
-        else:
-            message = "That's a winning move!"
-            
         # Save the user's selection
         session["user_captcha_selection"] = (row, col)
-        return jsonify({"success": True, "message": message})
+        return jsonify({"success": True, "message": "GO BOBCATS! That's a winning move."})
     else:
-        return jsonify({"success": False, "message": "That's not a winning move. Try again!"})
-
+        # Find any winning moves to check if there are any
+        winning_cells = []
+        for r in range(3):
+            for c in range(3):
+                if stored_board[r][c] == '':
+                    if check_win(stored_board, r, c, winning_symbol):
+                        winning_cells.append((r, c))
+        
+        if not winning_cells:
+            # No winning moves found - CAPTCHA might be broken
+            return jsonify({"success": True, "message": "Move accepted."})
+        else:
+            return jsonify({"success": False, "message": "That's not a winning move. Try again!"})
+        
 #old code:
 # from flask import Blueprint, send_file, session
 # from io import BytesIO

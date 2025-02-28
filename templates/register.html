@@ -136,6 +136,9 @@
       
       // Function to handle cell click
       function handleCellClick(row, col, cellElement) {
+        row = parseInt(row, 10);
+        col = parseInt(col, 10);
+        
         rowInput.value = row;
         colInput.value = col;
         
@@ -177,12 +180,6 @@
             captchaStatus.className = "captcha-status error";
             cellElement.classList.add('incorrect');
             captchaSolved = false;
-            
-            // Remove the symbol if the move is incorrect (optional)
-            // const symbol = cellElement.querySelector('.ttt-symbol');
-            // if (symbol) {
-            //   symbol.remove();
-            // }
           }
         })
         .catch(error => {
