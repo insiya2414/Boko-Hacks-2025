@@ -34,15 +34,19 @@ BOARD_SIZE = GRID_SIZE * CELL_SIZE
 
 def check_win(board, row, col, symbol):
     """Check if placing symbol at (row, col) would create a win"""
+    # First ensure the inputs are integers, not strings
+    row = int(row)
+    col = int(col)
+    
     # Make a copy of the board with the symbol placed
     test_board = [row[:] for row in board]
     test_board[row][col] = symbol
     
-    # Check row
+    # Checks row
     if all(test_board[row][c] == symbol for c in range(GRID_SIZE)):
         return True
         
-    # Check column
+    # Checks column
     if all(test_board[r][col] == symbol for r in range(GRID_SIZE)):
         return True
         
