@@ -19,6 +19,7 @@ Our Group's Application Security Challenge Platform for Texas State University's
 This project was a deliberately vulnerable web application created by Texas State University's BokoHacks committee, designed to help students learn about common web security vulnerabilities through hands-on practice. Our redesigned version remedies several challenges focusing on SQL injection, XSS (Cross-Site Scripting), access control flaws, and authentication bypass techniques. Our focus was to make sure the website was secure for regular users to traverse, adding both industry-standard and unique ways to strengthen authentication and accesses.
 
 
+
 ## Requirements
 - Python 3.8 or higher → [Download Python](https://www.python.org/downloads/)
 - Pip (Python package installer)
