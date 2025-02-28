@@ -156,10 +156,10 @@
         <div class="notes-container">
             <div id="message-area"></div>
             
-            <div class="admin-notice">
+           <!-- NO ADMIN NOTICE <div class="admin-notice">
                 <strong>Notice for admin users:</strong> Database maintenance scheduled. Table structure: notes(id, title, content, created_at, user_id)
                 <button class="close-notice">×</button>
-            </div>
+            </div> -->
 
             <form id="note-form">
                 <div class="form-header">
@@ -180,10 +180,10 @@
             <div id="notes-list">
                 {% for note in notes %}
                 <div class="note-card">
-                    <h3>{{ note.title | safe }}</h3>
+                    <h3>{{ note.title }}</h3>
                     <div class="note-content">{{ note.content | safe }}</div>
                     <div class="note-meta">
-                        ID: {{ note.id }} | Created: {{ note.created_at }}
+                        Created: {{ note.created_at }}
                         <button type="button" class="delete-btn" data-note-id="{{ note.id }}">Delete</button>
                     </div>
                 </div>
@@ -291,7 +291,7 @@
                         <h3>${note.title}</h3>
                         <div class="note-content">${note.content}</div>
                         <div class="note-meta">
-                            ID: ${note.id} | Created: ${note.created_at}
+                            Created: ${note.created_at}
                             <button type="button" class="delete-btn" data-note-id="${note.id}">Delete</button>
                         </div>
                     `;
@@ -347,7 +347,7 @@
                                 <h3>${note.title}</h3>
                                 <div class="note-content">${note.content}</div>
                                 <div class="note-meta">
-                                    ID: ${note.id} | Created: ${note.created_at}
+                                    Created: ${note.created_at}
                                     <button type="button" class="delete-btn" data-note-id="${note.id}">Delete</button>
                                 </div>
                             `;
