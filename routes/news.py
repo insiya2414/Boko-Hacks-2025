@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request
 import requests
-import json
 import os
 from dotenv import load_dotenv
 
@@ -10,7 +9,6 @@ news_bp = Blueprint('news', __name__, url_prefix='/apps/news')
 
 # Base URL for the News API
 NYTIMES_API_KEY = os.getenv("NYTIMES_API_KEY")
-INTERNAL_SECRET = os.getenv("INTERNAL_SECRET")
 NYTIMES_API_URL = "https://api.nytimes.com/svc/topstories/v2"
 
 # Mapping of our categories to API categories
@@ -18,24 +16,9 @@ CATEGORY_MAPPING = {
     'business': 'business',
     'technology': 'technology',
     'world': 'world',
+    'automobile': 'automobiles', 
+    'sports': 'sports',
 }
-
-INTERNAL_NEWS = [
-    {
-        "title": "CONFIDENTIAL: Security Update",
-        "description": "Internal security review document. Restricted access.",
-        "url": "#internal-only",
-        "publishedAt": "2025-01-15T08:30:00Z",
-        "imageUrl": ""
-    },
-    {
-        "title": "CONFIDENTIAL: Product Launch Details",
-        "description": "Upcoming product specifications for internal review only.",
-        "url": "#internal-only",
-        "publishedAt": "2025-02-01T10:15:00Z",
-        "imageUrl": ""
-    }
-]
 
 @news_bp.route('/')
 def news_page():
@@ -44,10 +27,10 @@ def news_page():
 
 @news_bp.route('/fetch', methods=['GET'])
 def fetch_news():
-    """Fetch news from the News API with a vulnerability"""
+    """Fetch news from the News API"""
     try:
         # Get category from request, default to business
-        category = request.args.get('category', 'general')
+        category = request.args.get('category', 'business')
         if category not in CATEGORY_MAPPING:
             return jsonify({'success': False, 'error': 'Invalid category'}), 400
         
@@ -64,20 +47,8 @@ def fetch_news():
             return jsonify({'success': False, 'error': 'Failed to fetch news'}), response.status_code
         
         data = response.json()
-        articles = data.get('results', [])[:10]
-   
-        filter_param = request.args.get('filter', '{}')
-            
-        try:
-            filter_options = json.loads(filter_param)
-        except json.JSONDecodeError:
-            return jsonify({'success': False, 'error': 'Invalid filter parameter'}), 400
-        
-        auth_token = request.headers.get("Authorization")
-        if filter_options.get('showInternal') is True and auth_token == f"Bearer {INTERNAL_SECRET}":
-            articles = INTERNAL_NEWS + articles
+        articles = data.get('results', [])[:10]  # Limit to 10 articles
 
-        # Transform the data to match expected format
         transformed_data = {
             'success': True,
             'category': category,
@@ -86,29 +57,28 @@ def fetch_news():
 
         # Process articles securely
         for article in articles:
-            
             summary = article.get('abstract', 'No summary available')
             url = article.get('url', "https://www.nytimes.com")
 
+            # Get first available image
+            image_url = "https://via.placeholder.com/150"
             multimedia = article.get('multimedia', [])
-            image_url = "https://via.placeholder.com/150"  # Default placeholder
-
-            if multimedia and isinstance(multimedia, list):  # Check if multimedia exists
+            if multimedia and isinstance(multimedia, list):
                 for media in multimedia:
-                    if media.get('url'):  # Find first valid image URL
+                    if media.get('url'):
                         image_url = media['url']
-                        break  # Stop after finding the first valid image
+                        break  # Use first available image
 
             transformed_data['data'].append({
                 'title': article.get('title', 'No Title'),
-                'summary': summary,
+                'content': summary,
                 'date': article.get('published_date', ''),
-                'url': url,
-                'imageUrl': image_url  # FIXED: Ensures the image URL is always valid
+                'readMoreUrl': url,
+                'imageUrl': image_url
             })
             
         return jsonify(transformed_data)
-    except requests.RequestException as e:
+    except requests.RequestException:
         return jsonify({'success': False, 'error': 'Error fetching news'}), 500
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
