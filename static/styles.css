@@ -613,7 +613,7 @@ input[type="text"],
 input[type="password"] {
   width: 100%; /* Make them full-width */
   padding: 12px; /* Increase padding */
-  font-size: 1.5rem; /* Increase font size */
+  font-size: 1.8rem; /* Increase font size */
   border: 2px solid #ccc; /* Optional: Adjust border */
   border-radius: 5px; /* Rounded corners */
   margin-bottom: 10px; /* Add space between fields */
@@ -631,3 +631,14 @@ background: linear-gradient(to right, var(--maroon-light), var(--maroon));
 transform: scale(1.05);
 box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3);
 } */
+
+.home-container,
+.auth-container {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; /* ✅ Smooth effect on both hover and un-hover */
+}
+
+.home-container:hover,
+.auth-container:hover {
+  transform: scale(1.03); /* Slight pop effect */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Softer elevated shadow */
+}
