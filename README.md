@@ -1,8 +1,23 @@
 # BokoHacks 2025
-An Application Security Challenge Platform for Texas State University's 2025 BokoHacks
+Our Group's Application Security Challenge Platform for Texas State University's 2025 BokoHacks
 
-## Overview
-This project is a deliberately vulnerable web application designed to help students learn about common web security vulnerabilities through hands-on practice. It includes various challenges focusing on SQL injection, XSS (Cross-Site Scripting), access control vulnerabilities, and authentication bypass techniques.
+
+## Table of Contents  
+- [Team Members](#team-members)  
+- [Overview](#overview)  
+- [Requirements](#requirements)  
+- [Setup Instructions](#setup-instructions)  
+
+
+## Team Members
+- Alyana Imperial
+- Insiya Raja
+- Vaidic Soni
+
+
+## Overview 
+This project was a deliberately vulnerable web application created by Texas State University's BokoHacks committee, designed to help students learn about common web security vulnerabilities through hands-on practice. Our redesigned version remedies several challenges focusing on SQL injection, XSS (Cross-Site Scripting), access control flaws, and authentication bypass techniques. Our focus was to make sure the website was secure for regular users to traverse, adding both industry-standard and unique ways to strengthen authentication and accesses.
+
 
 ## Requirements
 - Python 3.8 or higher → [Download Python](https://www.python.org/downloads/)
@@ -11,10 +26,12 @@ This project is a deliberately vulnerable web application designed to help stude
 - Modern web browser (Chrome/Firefox recommended)
 - Text editor or IDE VS Code recommended → [VS Code Setup](https://code.visualstudio.com/docs/python/environments)
 
+### How To Run ###
+
 ## Setup Instructions
 1. Clone the repository:
 ```bash
-git clone https://github.com/Nick4453/Boko-Hacks-2025.git
+git clone https://github.com/insiya2414/Boko-Hacks-2025.git
 cd boko-hacks-2025
 ```
 2. Git Setup (For Beginners)
@@ -71,43 +88,23 @@ VS Code Setup ---> https://code.visualstudio.com/docs/python/environments
 ```bash
 pip install -r requirements.txt
 ```
-
-5. Initialize the database: (You may not need to do this step; if it doesn't work, check that your env path is correct)
+5. Install dependencies
+```bash
+pip install flask-wtf
+pip install flask-limiter
+pip install python-dotenv
+```
+6. Initialize the database: (You may not need to do this step; if it doesn't work, check that your env path is correct)
 ```bash
 python -c "from app import app, setup_database; app.app_context().push(); setup_database()"
 ```
 
-6. Start the application: 
+8. Start the application: 
 ```bash
 python app.py
 ```
 
-7. Open http://localhost:5000 in your browser
+9. Open http://localhost:5000 in your browser and access the given URL (To stop runnning: ^C)
 
-8. Shut Down the Application
-To stop the application, press Ctrl + C in the terminal where the application is running. This will terminate the Flask server.
 
-## Learning Resources
-If you're new to web application security testing, here are some resources to help you understand the vulnerabilities you might encounter:
 
-1. [OWASP Top 10](https://owasp.org/www-project-top-ten/) - The standard awareness document for web application security
-2. [PortSwigger Web Security Academy](https://portswigger.net/web-security) - Free, online web security training
-3. [SQL Injection Cheat Sheet](https://portswigger.net/web-security/sql-injection/cheat-sheet)
-4. [XSS Cheat Sheet](https://portswigger.net/web-security/cross-site-scripting/cheat-sheet)
-5. [PayloadsAllTheThings](https://github.com/swisskyrepo/PayloadsAllTheThings) - A list of useful payloads for bypassing security controls
-
-## Development Notes
-- The application uses Flask for the backend
-- SQLite databases store application data
-- Frontend uses vanilla JavaScript and CSS
-- All vulnerabilities are intentional for educational purposes
-
-## Security Notice
-This application contains intentional security vulnerabilities for educational purposes. **DO NOT**:
-- **Use real credentials or sensitive information while testing**
-- Deploy this application on a public network or server
-- Use techniques learned here against real websites without explicit permission
-**NOTE: IF YOU USE REAL CREDENTIALS, IE: PASSWORDS YOU ACTUALLY USE, WHEN YOU UPLOAD YOUR REPO, THE DATABASE WILL BE PUBLIC. THIS DATABASE CAN BE CONVERTED EASILY ONLINE UNLESS ENCRYPTED**
-
-## License
-MIT License - See LICENSE file for details
