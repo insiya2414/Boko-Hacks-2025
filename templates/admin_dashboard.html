@@ -5,25 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - BokoHacks</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background: url("https://pbs.twimg.com/media/D3903u6WsAErQ3m?format=jpg&name=4096x4096") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            color: black;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 150px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.9); /* Adds slight transparency */
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            margin-top: 80px;
+        }
+        
+        header {
+            margin-bottom: 20px;
+        }
+        
+        a {
+            color: maroon;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: maroon;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background-color: darkred;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Admin Dashboard</h1>
-        <nav>
-            <ul>
-                <li><a href="{{ url_for('admin.logout') }}">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
-    
-    <main>
-        <h2>Welcome, {{ session['admin_username'] }}</h2>
-        <p>Manage Users and System Settings</p>
+    <div class="container">
+        <header>
+            <h1>Admin Dashboard</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('admin.logout') }}">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
         
-        <section>
+        <main>
+            <h2>Welcome, {{ session['admin_username'] }}</h2>
+            <p>Manage Users and System Settings</p>
             <h3>Manage Users</h3>
-            <a href="{{ url_for('admin.get_users') }}">View All Users</a>
-        </section>
-    </main>
+            <a href="{{ url_for('admin.get_users') }}" class="btn">View All Users</a>
+        </main>
+    </div>
 </body>
 </html>
