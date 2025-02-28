@@ -15,7 +15,7 @@ Our Group's Application Security Challenge Platform for Texas State University's
 - Vaidic Soni
 
 
-## Overview 
+# Overview 
 This project was a deliberately vulnerable web application created by Texas State University's BokoHacks committee, designed to help students learn about common web security vulnerabilities through hands-on practice. Our redesigned version remedies several challenges focusing on SQL injection, XSS (Cross-Site Scripting), access control flaws, and authentication bypass techniques. Our focus was to make sure the website was secure for regular users to traverse, adding both industry-standard and unique ways to strengthen authentication and accesses.
 
 ## Security Issues Resolved
@@ -32,6 +32,13 @@ This project was a deliberately vulnerable web application created by Texas Stat
 - Login Attempts Restricted: Does not allow brute force logins to avoid a non-authorized user to login
 - Prevents Arbitrary Account Resets: Ensures that only the logged-in user can reset their own account. This prevents attackers from resetting other users’ accounts maliciously. 
 - Rate Limiting: Uses Flask-Limiter to restrict repeated API calls, such as login attempts or balance checks. This helps prevent abuse, brute-force attacks, and API overuse.
+- Redesigned the entire UI to create a more innovative, user-friendly, and visually engaging experience, improving usability and interaction.
+
+## Potential Future Implementations
+- Multi-Factor Authentication (MFA): Require users to verify their identity with an extra authentication step, such as an email OTP, authenticator app, or security question.
+- Creating a full fledged Admin Portal 
+- End-to-End Encryption (E2EE) for Notes: Encrypt user notes before storing them, ensuring only the user can decrypt them.
+- Database Encryption: Encrypt sensitive user data like emails and personal information at rest.
 
 
 
@@ -106,7 +113,9 @@ pip install -r requirements.txt
 ```
 5. Install dependencies
 ```bash
-pip install flask-wtf
+pip install flask-sqlalchemy
+pip install pillow
+pip install requests
 pip install flask-limiter
 pip install python-dotenv
 ```
