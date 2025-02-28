@@ -4,7 +4,61 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <title>Login - BokoHacks</title>
+  <script>
+    function togglePassword() {
+      let passwordInput = document.getElementById("password");
+      let eyeIcon = document.getElementById("eye-icon");
+
+      // Add animation class
+      eyeIcon.classList.add("eye-animate");
+
+      // Toggle password visibility
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye"); // Open eye
+      } else {
+        passwordInput.type = "password";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash"); // Closed eye
+      }
+
+      // Remove animation class after animation completes
+      setTimeout(() => {
+        eyeIcon.classList.remove("eye-animate");
+      }, 300);
+    }
+  </script>
+  <style>
+    .password-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-container input {
+      flex: 1;
+      padding-right: 30px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      cursor: pointer;
+    }
+
+    .eye-animate {
+      animation: scaleEye 0.2s ease-in-out;
+    }
+
+    @keyframes scaleEye {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -37,8 +91,13 @@
         <input type="text" id="username" name="username" placeholder="Enter your username" required>
         
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-        
+        <div class="password-container">
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          <span class="toggle-password" onclick="togglePassword()">
+            <i id="eye-icon" class="fa-solid fa-eye-slash"></i>
+          </span>
+        </div>
+
         <button type="submit">Login</button>
       </form>
       <p>Don't have an account? <a href="/register">Register here</a>.</p>
