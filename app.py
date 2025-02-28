@@ -18,12 +18,19 @@ from models.admin import Admin
 from models.file import File  
 from sqlalchemy import inspect
 import os
+from flask import Flask, request, jsonify
+
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///boko_hacks.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max file size
+@app.errorhandler(413)  # Handle Payload Too Large error
+def file_too_large(error):
+    return jsonify({'success': False, 'error': 'File size too large. Max allowed size is 10MB.'}), 413
+
 
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

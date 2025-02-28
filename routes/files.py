@@ -39,59 +39,82 @@ def files():
 
 @files_bp.route('/upload', methods=['POST'])
 def upload_file():
-    """Handle file upload with intentional vulnerability"""
-    print("\n=== FILE UPLOAD ATTEMPT ===")
-    print(f"Request method: {request.method}")
-    print(f"Form data: {request.form}")
-    print(f"Files: {request.files}")
-    
+    """Secure File Upload with Strict Type Validation"""
     if 'user' not in session:
-        print("User not logged in")
         return jsonify({'success': False, 'error': 'Not logged in'}), 401
-        
-    current_user = User.query.filter_by(username=session['user']).first()
-    if not current_user:
-        print(f"User {session['user']} not found in database")
-        return jsonify({'success': False, 'error': 'User not found'}), 404
 
     file = request.files.get('file')
-    print(f"Received file: {file}")
-    
     if not file:
-        print("No file part in request")
-        return jsonify({'success': False, 'error': 'No file part'}), 400
+        return jsonify({'success': False, 'error': 'No file uploaded'}), 400
+
+    filename = secure_filename(file.filename)
+
+    # **Check File Extension**
+    if not allowed_file(filename):
+        return jsonify({'success': False, 'error': 'Invalid file type! Allowed: pdf, png, jpg, jpeg, gif'}), 400
+
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(file_path)
+
+    new_file = File(filename=filename, file_path=file_path, user_id=session['user'])
+    db.session.add(new_file)
+    db.session.commit()
+
+    return jsonify({'success': True, 'message': 'File uploaded successfully!', 'file': new_file.to_dict()})
+# def upload_file():
+#     """Handle file upload with intentional vulnerability"""
+#     print("\n=== FILE UPLOAD ATTEMPT ===")
+#     print(f"Request method: {request.method}")
+#     print(f"Form data: {request.form}")
+#     print(f"Files: {request.files}")
     
-    if file:  
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(UPLOAD_FOLDER, filename)
-        print(f"File path: {file_path}")
+#     if 'user' not in session:
+#         print("User not logged in")
+#         return jsonify({'success': False, 'error': 'Not logged in'}), 401
         
-        try:
-            file.save(file_path)
-            print(f"File saved successfully at {file_path}")
+#     current_user = User.query.filter_by(username=session['user']).first()
+#     if not current_user:
+#         print(f"User {session['user']} not found in database")
+#         return jsonify({'success': False, 'error': 'User not found'}), 404
 
-            new_file = File(
-                filename=filename,
-                file_path=file_path,
-                user_id=current_user.id
-            )
-            db.session.add(new_file)
-            db.session.commit()
-            print(f"File record saved to database with ID: {new_file.id}")
+#     file = request.files.get('file')
+#     print(f"Received file: {file}")
+    
+#     if not file:
+#         print("No file part in request")
+#         return jsonify({'success': False, 'error': 'No file part'}), 400
+    
+#     if file:  
+#         filename = secure_filename(file.filename)
+#         file_path = os.path.join(UPLOAD_FOLDER, filename)
+#         print(f"File path: {file_path}")
+        
+#         try:
+#             file.save(file_path)
+#             print(f"File saved successfully at {file_path}")
 
-            return jsonify({
-                'success': True,
-                'message': 'File uploaded successfully!',
-                'file': new_file.to_dict()
-            })
-        except Exception as e:
-            print(f"Error saving file: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return jsonify({'success': False, 'error': str(e)}), 500
-    else:
-        print("File type not allowed or no file uploaded")
-        return jsonify({'success': False, 'error': 'File type not allowed'}), 400
+#             new_file = File(
+#                 filename=filename,
+#                 file_path=file_path,
+#                 user_id=current_user.id
+#             )
+#             db.session.add(new_file)
+#             db.session.commit()
+#             print(f"File record saved to database with ID: {new_file.id}")
+
+#             return jsonify({
+#                 'success': True,
+#                 'message': 'File uploaded successfully!',
+#                 'file': new_file.to_dict()
+#             })
+    #     except Exception as e:
+    #         print(f"Error saving file: {str(e)}")
+    #         import traceback
+    #         traceback.print_exc()
+    #         return jsonify({'success': False, 'error': str(e)}), 500
+    # else:
+    #     print("File type not allowed or no file uploaded")
+    #     return jsonify({'success': False, 'error': 'File type not allowed'}), 400
 
 @files_bp.route('/delete/<int:file_id>', methods=['DELETE'])
 def delete_file(file_id):
