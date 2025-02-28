@@ -150,7 +150,7 @@
     <div class="notes-app">
         <div class="notes-header">
             <h2>SecureNotes v0.1-beta</h2>
-            <p class="app-desc">A totally secure note-taking application</p>
+            <p class="app-desc"> Bobcat-safe note-taking application</p>
         </div>
         
         <div class="notes-container">
@@ -167,9 +167,8 @@
                     <span class="form-title">Create New Note</span>
                     <span class="beta-tag">BETA</span>
                 </div>
-                <input type="text" name="title" id="note-title" placeholder="Enter title (supports custom formatting)" required>
-                <textarea name="content" id="note-content" placeholder="Enter your note content here. Pro tip: You can use special characters for formatting!" required></textarea>
-                <div class="format-hint">Need formatting help? Try using special characters!</div>
+                <input type="text" name="title" id="note-title" placeholder="Enter Title" required>
+                <textarea name="content" id="note-content" placeholder="Enter your bobcat content here. Max characters of 1000" required></textarea>
                 <button type="submit">Save Note</button>
             </form>
 
@@ -181,8 +180,8 @@
             <div id="notes-list">
                 {% for note in notes %}
                 <div class="note-card">
-                    <h3>{{ note.title | safe }}</h3>
-                    <div class="note-content">{{ note.content | safe }}</div>
+                    <h3>{{ note.title}}</h3>
+                    <div class="note-content">{{ note.content}}</div>
                     <div class="note-meta">
                         Created: {{ note.created_at }}
                         <button type="button" class="delete-btn" data-note-id="{{ note.id }}">Delete</button>
