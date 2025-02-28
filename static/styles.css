@@ -609,21 +609,50 @@ a.btn:hover, button.btn:hover {
   padding: 1rem 2rem; /* Reduce button padding */
   font-size: 1.5rem; /* Reduce font size */
 }
-input[type="text"], 
-input[type="password"] {
-  width: 100%; /* Make them full-width */
-  padding: 12px; /* Increase padding */
-  font-size: 1.8rem; /* Increase font size */
-  border: 2px solid #ccc; /* Optional: Adjust border */
-  border-radius: 5px; /* Rounded corners */
-  margin-bottom: 10px; /* Add space between fields */
+.admin-page .auth-container input[type="text"], 
+.admin-page .auth-container input[type="password"] {
+  width: 100%; /* Full width */
+  padding: 12px; /* Equal padding */
+  font-size: 1.8rem; /* Consistent text size */
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  box-sizing: border-box; /* Prevents box expansion issues */
 }
 
+/* Fix password input inside the container */
+.password-container {
+  width: 100%; /* Ensure it matches other inputs */
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Ensure password input matches text input */
+.password-container input {
+  width: 100%; /* Take full width */
+  padding: 12px;
+  font-size: 1.8rem;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Fix toggle eye icon inside password input */
+.toggle-password {
+  position: absolute;
+  right: 15px;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: var(--gray-dark);
+}
+
+/* Ensure labels are consistent */
 label {
-  font-size: 1.6rem; /* Adjust size as needed */
-  font-weight: bold; /* Optional: Make it bold */
-  display: block; /* Ensures it appears on a new line */
-  margin-bottom: 5px; /* Adds spacing below the label */
+  font-size: 1.6rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
 }
 
 /* button[type="submit"] {
