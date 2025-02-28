@@ -5,25 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - BokoHacks</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
-<body>
+<body class="admin-page">
     <header>
         <h1>Admin Login</h1>
     </header>
-    <main>
-        <form method="POST" action="{{ url_for('admin.admin_login') }}">
-            <label for="username">Username:</label>
-            <input type="text" name="username" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" name="password" required>
-            
-            <button type="submit">Login</button>
-        </form>
-        
-        {% if error %}
-            <p class="error">{{ error }}</p>
-        {% endif %}
-    </main>
+
+    <div class="auth-page">
+        <div class="auth-container">
+            <h2>Admin Login</h2>
+            <form method="POST" action="{{ url_for('admin.admin_login') }}">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                
+                <label for="password">Password:</label>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <span class="toggle-password" onclick="togglePassword()">
+                        <i id="eye-icon" class="fa-solid fa-eye-slash"></i> <!-- Default: Closed eye -->
+                    </span>
+                </div>
+
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            let passwordInput = document.getElementById("password");
+            let eyeIcon = document.getElementById("eye-icon");
+
+            // Add animation class
+            eyeIcon.classList.add("eye-animate");
+
+            // Toggle password visibility
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye"); // Open eye
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash"); // Closed eye
+            }
+
+            // Remove animation class after animation completes (to allow re-triggering)
+            setTimeout(() => {
+                eyeIcon.classList.remove("eye-animate");
+            }, 300);
+        }
+    </script>
 </body>
 </html>

@@ -65,13 +65,6 @@
   transform: scale(1.05);
   box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3);
 }
-  
-  /* header {
-    background-color: var(--maroon);
-    color: var(--white);
-    padding: 1.5rem;
-    text-align: center;
-  } */
 
   header {
     background: var(--maroon);
@@ -120,7 +113,7 @@ nav ul {
   }
   
   main {
-    padding: 2rem;
+    padding: 3rem;
     max-width: 1200px;
     margin: 0 auto;
     padding-top: 120px; /* Adjusts spacing under navbar */
@@ -152,7 +145,7 @@ nav ul {
   }
   
   section p {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     line-height: 1.6;
     color: var(--gray-dark);
   }
@@ -182,7 +175,7 @@ nav ul {
     font-size: 1rem;
   }
   
-  form button {
+  /* form button {
     background-color: var(--maroon);
     color: var(--white);
     padding: 0.75rem 1.5rem;
@@ -195,7 +188,43 @@ nav ul {
   
   form button:hover {
     background-color: var(--maroon-light);
-  }
+  } */
+
+  /* Apply the .btn style to the login button */
+form button {
+  display: inline-block;
+  background: linear-gradient(to right, var(--maroon), var(--maroon-light));
+  color: var(--white);
+  font-weight: bold;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 30px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+  margin: 0.5rem;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  cursor: pointer; /* Ensure it looks clickable */
+  width: 100%; /* Optional: Make it full-width */
+  text-align: center;
+}
+
+button,
+form button,
+.auth-container .btn {
+  font-family: inherit; /* Uses the same font as the parent container */
+  font-size: 1.5rem; /* Match existing button size */
+}
+
+
+/* Hover effect */
+form button:hover {
+  background: linear-gradient(to right, var(--maroon-light), var(--maroon));
+  transform: scale(1.05);
+  box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3);
+}
+
   
   footer {
     background-color: var(--maroon);
@@ -245,6 +274,17 @@ nav ul {
 .dashboard-header h1 {
   margin: 0;
   font-size: 2rem;
+}
+
+.dashboard-header nav ul li a.active,
+.dashboard-header nav ul li a.logout-link {
+  background-color: var(--maroon);
+  color: var(--white);
+  padding: 0.3rem 1.2rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 5px;
 }
 
 .search-logout-container {
@@ -301,14 +341,6 @@ nav ul {
   background-color: var(--maroon-light);
 }
 
-/* .dashboard-content {
-  background-color: var(--white);
-  color: var(--gray-dark);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin: 1rem 2rem;
-} */
 .dashboard-content {
   background: rgba(255, 255, 255, 0.95); /* Slight transparency */
   color: var(--gray-dark);
@@ -329,7 +361,6 @@ nav ul {
   color: var(--gray-dark);
   font-weight: bold;
 }
-
 .apps-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* ✅ 2 columns */
@@ -337,36 +368,10 @@ nav ul {
   padding: 2rem;
   width: 90%;
   max-width: 100%; /* ✅ Ensure grid fits within container */
-  box-sizing: border-box; /* ✅ Prevent extra spacing issues */
+  box-sizing: border-box;
+  align-items: stretch; /* ✅ Ensures equal height */
 }
 
-/* .app-card {
-  background: var(--white);
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  text-decoration: none;
-  color: var(--gray-dark);
-  transition: transform 0.2s, box-shadow 0.2s;
-  border: 2px solid transparent;
-}
-
-.app-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  border-color: var(--maroon);
-}
-
-.app-card h3 {
-  color: var(--maroon);
-  margin: 0 0 1rem 0;
-  font-size: 1.2rem;
-}
-
-.app-card p {
-  margin: 0 0 1rem 0;
-  line-height: 1.4;
-} */
 
 .app-card {
   background: var(--white);
@@ -376,9 +381,13 @@ nav ul {
   transition: transform 0.2s, box-shadow 0.2s;
   border: 1px solid #ddd;
   text-align: center;
-  width: 100%; /* ✅ Ensure cards don't exceed grid size */
-  max-width: 450px; /* ✅ Limit card width */
-  margin: auto; /* ✅ Center cards within the columns */
+  width: 100%; /* ✅ Ensure cards fit grid */
+  max-width: 450px; /* ✅ Limit width */
+  margin: auto; /* ✅ Center within columns */
+  height: 200px; /* ✅ Set a fixed height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .app-card:hover {
@@ -387,25 +396,24 @@ nav ul {
   border-color: var(--maroon);
 }
 
-
 .app-card h3 {
-  font-size: 1.4rem;
+  font-size: 1.7rem;
   color: var(--maroon);
 }
 
 .app-card p {
-  font-size: 1rem;
+  font-size: 1.3rem;
   color: var(--gray-dark);
 }
 
-.difficulty {
+/* .difficulty {
   display: inline-block;
   padding: 0.3rem 0.6rem;
   background: var(--gray-light);
   border-radius: 4px;
   font-size: 0.9rem;
   color: var(--gray-dark);
-}
+} */
 
 /* Add to styles.css */
 .modal {
@@ -589,3 +597,36 @@ a.btn:hover, button.btn:hover {
     transform: rotate(360deg);
   }
 }
+
+.admin-page .auth-container {
+  max-width: 350px; /* Reduce width */
+  padding: 2rem; /* Reduce padding */
+}
+
+/* Smaller Login Button for Admin */
+.admin-page .auth-container .btn {
+  padding: 0.5rem 1rem; /* Reduce button padding */
+  font-size: 1rem; /* Reduce font size */
+}
+input[type="text"], 
+input[type="password"] {
+  width: 100%; /* Make them full-width */
+  padding: 12px; /* Increase padding */
+  font-size: 1.5rem; /* Increase font size */
+  border: 2px solid #ccc; /* Optional: Adjust border */
+  border-radius: 5px; /* Rounded corners */
+  margin-bottom: 10px; /* Add space between fields */
+}
+
+label {
+  font-size: 1.6rem; /* Adjust size as needed */
+  font-weight: bold; /* Optional: Make it bold */
+  display: block; /* Ensures it appears on a new line */
+  margin-bottom: 5px; /* Adds spacing below the label */
+}
+
+/* button[type="submit"] {
+background: linear-gradient(to right, var(--maroon-light), var(--maroon));
+transform: scale(1.05);
+box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3);
+} */
