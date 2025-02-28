@@ -45,6 +45,14 @@ def create_note():
     if not title or not content:
         return jsonify({'success': False, 'error': 'Title and content are required'}), 400
     
+    #added to prevent large payloads (with a smartass error message)
+    MAX_CONTENT_LENGTH = 1000  # Set maximum content length to 1000 characters
+    if len(content) > MAX_CONTENT_LENGTH:
+        return jsonify({
+            'success': False, 
+            'error': 'HEY! Better not be putting too much on there! Keep your notes under 1000 characters!'
+        }), 413  # 413 Payload Too Large
+
     try:
         print(f"Creating note - Title: {title}, Content: {content}")
         
