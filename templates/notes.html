@@ -181,8 +181,8 @@
             <div id="notes-list">
                 {% for note in notes %}
                 <div class="note-card">
-                    <h3>{{ note.title | safe }}</h3>
-                    <div class="note-content">{{ note.content | safe }}</div>
+                    <h3>{{ note.title}}</h3>
+                    <div class="note-content">{{ note.content}}</div>
                     <div class="note-meta">
                         Created: {{ note.created_at }}
                         <button type="button" class="delete-btn" data-note-id="{{ note.id }}">Delete</button>

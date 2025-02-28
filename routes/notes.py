@@ -100,7 +100,6 @@ def search_notes():
     try:
         #USe parameterized query instead of string formatting
         sql = text("SELECT * FROM notes WHERE (title LIKE :query OR content LIKE :query) AND user_id = :user_id")
-        #sql = f"SELECT * FROM notes WHERE title LIKE '%{query}%' OR content LIKE '%{query}%'"
         
         # Log the raw SQL for debugging
         print(f"Executing SQL: {sql}")
