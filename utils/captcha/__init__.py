@@ -62,14 +62,15 @@ def check_win(board, row, col, symbol):
     return False
 
 def generate_TTT_board():
-    """Generate a TicTacToe board with a potential winning move"""
-    # Initialize empty board - FIXED: Proper 2D list initialization
+    """Generate a TicTacToe board with EXACTLY ONE winning move"""
+    # Initialize empty board
     board = [['' for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
     
     # Choose a winning symbol
     winning_symbol = "X" if random.choice([True, False]) else "O"
+    other_symbol = "O" if winning_symbol == "X" else "X"
     
-    # CHANGED: Now intentionally creates a position with a potential winning move
+    # Create a position with a potential winning move
     win_type = random.choice(["row", "column", "diagonal"])
     
     if win_type == "row":
@@ -113,25 +114,50 @@ def generate_TTT_board():
             winning_cell = (empty_pos, GRID_SIZE - 1 - empty_pos)
     
     # Add some random X's and O's in other positions
-    other_symbol = "O" if winning_symbol == "X" else "X"
     empty_cells = [(r, c) for r in range(GRID_SIZE) for c in range(GRID_SIZE) 
                   if board[r][c] == '' and (r, c) != winning_cell]
     
-    # Place 2-4 of the other symbol
-    for _ in range(min(random.randint(2, 4), len(empty_cells))):
-        if not empty_cells:
-            break
-        r, c = random.choice(empty_cells)
-        empty_cells.remove((r, c))
-        board[r][c] = other_symbol
-    
-    # Verify the winning cell actually creates a win
+    # CRITICAL FIX: Before adding other symbols, verify no alternate winning moves exist
+    # Will regenerate every time there are multiple winning cells or moves
     win_row, win_col = winning_cell
     if not check_win(board, win_row, win_col, winning_symbol):
         # If somehow our logic failed, regenerate the board
         return generate_TTT_board()
-        
+    
+    other_winning_cells = []
+    for r, c in empty_cells:
+        if check_win(board, r, c, winning_symbol):
+            other_winning_cells.append((r, c))
+    
+
+    if other_winning_cells:
+        return generate_TTT_board()
+    
+    # Now it's safe to add random other symbols - they won't create winning moves
+    # Solution: randomized still but place 2-4 of the other symbol
+    cells_to_fill = min(random.randint(2, 4), len(empty_cells))
+    cells_to_use = random.sample(empty_cells, cells_to_fill)
+    
+    for r, c in cells_to_use:
+        board[r][c] = other_symbol
+    
+    # Final verification - check again that no alternate winning moves exist
+    # This handles the case where adding the other symbol might block a potential
+    empty_cells = [(r, c) for r in range(GRID_SIZE) for c in range(GRID_SIZE) 
+                  if board[r][c] == '']
+    
+    winning_cells = []
+    for r, c in empty_cells:
+        if check_win(board, r, c, winning_symbol):
+            winning_cells.append((r, c))
+    
+    # regenerates if theres not an exact winner
+    if len(winning_cells) != 1 or winning_cells[0] != winning_cell:
+        return generate_TTT_board()
+    
     return board, winning_cell, winning_symbol
+
+
 
 def draw_TTT_captcha(board):
     """Draw the TicTacToe board as an image"""
