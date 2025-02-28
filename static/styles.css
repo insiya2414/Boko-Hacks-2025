@@ -17,6 +17,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 50px;
   }
   
   /* Move everything down from navbar */
@@ -605,8 +606,8 @@ a.btn:hover, button.btn:hover {
 
 /* Smaller Login Button for Admin */
 .admin-page .auth-container .btn {
-  padding: 0.5rem 1rem; /* Reduce button padding */
-  font-size: 1rem; /* Reduce font size */
+  padding: 1rem 2rem; /* Reduce button padding */
+  font-size: 1.5rem; /* Reduce font size */
 }
 input[type="text"], 
 input[type="password"] {
