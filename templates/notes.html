@@ -156,10 +156,11 @@
         <div class="notes-container">
             <div id="message-area"></div>
             
-            <div class="admin-notice">
+            <!-- <div class="admin-notice">
+                hidden
                 <strong>Notice for admin users:</strong> Database maintenance scheduled.
                 <button class="close-notice">×</button>
-            </div>
+            </div> -->
 
             <form id="note-form">
                 <div class="form-header">
@@ -183,7 +184,7 @@
                     <h3>{{ note.title | safe }}</h3>
                     <div class="note-content">{{ note.content | safe }}</div>
                     <div class="note-meta">
-                        ID: {{ note.id }} | Created: {{ note.created_at }}
+                        Created: {{ note.created_at }}
                         <button type="button" class="delete-btn" data-note-id="{{ note.id }}">Delete</button>
                     </div>
                 </div>
@@ -202,12 +203,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Notes app initialized');
             
-            const closeBtn = document.querySelector('.close-notice');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', function() {
-                    document.querySelector('.admin-notice').style.display = 'none';
-                });
-            }
+            // const closeBtn = document.querySelector('.close-notice');
+            // if (closeBtn) {
+            //     closeBtn.addEventListener('click', function() {
+            //         document.querySelector('.admin-notice').style.display = 'none';
+            //     });
+            // }
             
             const form = document.getElementById('note-form');
             if (form) {
@@ -291,7 +292,7 @@
                         <h3>${note.title}</h3>
                         <div class="note-content">${note.content}</div>
                         <div class="note-meta">
-                            ID: ${note.id} | Created: ${note.created_at}
+                            Created: ${note.created_at}
                             <button type="button" class="delete-btn" data-note-id="${note.id}">Delete</button>
                         </div>
                     `;
@@ -347,7 +348,7 @@
                                 <h3>${note.title}</h3>
                                 <div class="note-content">${note.content}</div>
                                 <div class="note-meta">
-                                    ID: ${note.id} | Created: ${note.created_at}
+                                    Created: ${note.created_at}
                                     <button type="button" class="delete-btn" data-note-id="${note.id}">Delete</button>
                                 </div>
                             `;
