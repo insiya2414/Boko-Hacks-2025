@@ -1,36 +1,40 @@
 from flask import Blueprint, render_template, jsonify, request
 import requests
 import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 news_bp = Blueprint('news', __name__, url_prefix='/apps/news')
 
 # Base URL for the News API
-NEWS_API_BASE_URL = "https://saurav.tech/NewsAPI"
+NYTIMES_API_KEY = os.getenv("NYTIMES_API_KEY")
+INTERNAL_SECRET = os.getenv("INTERNAL_SECRET")
+NYTIMES_API_URL = "https://api.nytimes.com/svc/topstories/v2"
 
 # Mapping of our categories to API categories
 CATEGORY_MAPPING = {
     'business': 'business',
     'technology': 'technology',
-    'world': 'general'
+    'world': 'world',
 }
-
-DEFAULT_COUNTRY = 'us'
 
 INTERNAL_NEWS = [
     {
-        "title": "CONFIDENTIAL: Security Breach Report Q3",
-        "description": "Details of recent security incidents affecting customer data. For internal review only.",
+        "title": "CONFIDENTIAL: Security Update",
+        "description": "Internal security review document. Restricted access.",
         "url": "#internal-only",
         "publishedAt": "2025-01-15T08:30:00Z",
-        "urlToImage": ""
+        "imageUrl": ""
     },
     {
-        "title": "CONFIDENTIAL: Upcoming Product Launch",
-        "description": "Specifications for our next-gen product launch in Q2. Contains proprietary information.",
+        "title": "CONFIDENTIAL: Product Launch Details",
+        "description": "Upcoming product specifications for internal review only.",
         "url": "#internal-only",
         "publishedAt": "2025-02-01T10:15:00Z",
-        "urlToImage": ""
-    },
+        "imageUrl": ""
+    }
 ]
 
 @news_bp.route('/')
@@ -43,35 +47,34 @@ def fetch_news():
     """Fetch news from the News API with a vulnerability"""
     try:
         # Get category from request, default to business
-        category = request.args.get('category', 'business')
+        category = request.args.get('category', 'general')
         if category not in CATEGORY_MAPPING:
             return jsonify({'success': False, 'error': 'Invalid category'}), 400
         
-        # Map our category to API category
         api_category = CATEGORY_MAPPING[category]
-        api_url = f"{NEWS_API_BASE_URL}/top-headlines/category/{api_category}/{DEFAULT_COUNTRY}.json"
+
+        if not NYTIMES_API_KEY:
+            return jsonify({'success': False, 'error': 'API key missing'}), 500
         
-        # Fetch news from external API
+        api_url = f"{NYTIMES_API_URL}/{api_category}.json?api-key={NYTIMES_API_KEY}"
+
         response = requests.get(api_url, timeout=10)
-        
+
         if response.status_code != 200:
-            return jsonify({
-                'success': False,
-                'error': f'Failed to fetch news. Status code: {response.status_code}'
-            }), response.status_code
+            return jsonify({'success': False, 'error': 'Failed to fetch news'}), response.status_code
         
         data = response.json()
-        articles = data.get('articles', [])[:10]
-
-            
+        articles = data.get('results', [])[:10]
+   
         filter_param = request.args.get('filter', '{}')
             
         try:
             filter_options = json.loads(filter_param)
         except json.JSONDecodeError:
             return jsonify({'success': False, 'error': 'Invalid filter parameter'}), 400
-                
-        if filter_options.get('showInternal') is True:
+        
+        auth_token = request.headers.get("Authorization")
+        if filter_options.get('showInternal') is True and auth_token == f"Bearer {INTERNAL_SECRET}":
             articles = INTERNAL_NEWS + articles
 
         # Transform the data to match expected format
@@ -83,12 +86,25 @@ def fetch_news():
 
         # Process articles securely
         for article in articles:
+            
+            summary = article.get('abstract', 'No summary available')
+            url = article.get('url', "https://www.nytimes.com")
+
+            multimedia = article.get('multimedia', [])
+            image_url = "https://via.placeholder.com/150"  # Default placeholder
+
+            if multimedia and isinstance(multimedia, list):  # Check if multimedia exists
+                for media in multimedia:
+                    if media.get('url'):  # Find first valid image URL
+                        image_url = media['url']
+                        break  # Stop after finding the first valid image
+
             transformed_data['data'].append({
                 'title': article.get('title', 'No Title'),
-                'content': article.get('description', 'No content available'),
-                'date': article.get('publishedAt', ''),
-                'readMoreUrl': article.get('url', '#') if article.get('url', '').startswith("http") else "#",
-                'imageUrl': article.get('urlToImage', '')
+                'summary': summary,
+                'date': article.get('published_date', ''),
+                'url': url,
+                'imageUrl': image_url  # FIXED: Ensures the image URL is always valid
             })
             
         return jsonify(transformed_data)
