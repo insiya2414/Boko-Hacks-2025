@@ -48,7 +48,7 @@
     <section>
       <h2>Create an Account</h2>
       <p>Sign up to participate in BokoHacks and test your security skills.</p>
-      <form action="{{ url_for('register.register') }}" method="POST">
+      <form action="{{ url_for('register.register') }}" method="POST" id="register-form">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" placeholder="Choose a username" required>
         
@@ -71,15 +71,18 @@
         <div class="captcha-box">
           <p class="captcha-instructions">{{ session.get('captcha_instructions', 'Click on the cell where placing the symbol would create a winning line') }}</p>
           <div class="ttt-captcha-container">
-          <img src="{{ url_for('captcha.get_captcha') }}" alt="TicTacToe CAPTCHA" class="captcha-image" id="ttt-captcha">
+            <img src="{{ url_for('captcha.get_captcha') }}" alt="TicTacToe CAPTCHA" class="captcha-image" id="ttt-captcha">
+            <div class="ttt-grid" id="ttt-grid">
+              <!-- Grid cells will be added by JavaScript -->
+            </div>
           </div>
           <input type="hidden" id="captcha_row" name="captcha_row" value="">
           <input type="hidden" id="captcha_col" name="captcha_col" value="">
+          <div class="captcha-status" id="captcha-status"></div>
           <button type="button" id="refresh-captcha">Refresh CAPTCHA</button>
         </div>
-        <!-- <input type="text" id="captcha" name="captcha" placeholder="Enter the text shown above" required> -->
 
-        <button type="submit">Register</button>
+        <button type="submit" id="register-button">Register</button>
       </form>
       <p>Already have an account? <a href="{{ url_for('login.login') }}">Login here</a>.</p>
     </section>
@@ -94,35 +97,137 @@
       const rowInput = document.getElementById('captcha_row');
       const colInput = document.getElementById('captcha_col');
       const refreshBtn = document.getElementById('refresh-captcha');
+      const captchaStatus = document.getElementById('captcha-status');
+      const registerForm = document.getElementById('register-form');
+      const tttGrid = document.getElementById('ttt-grid');
       
-      // Handle click on the TicTacToe board
-      captchaImg.addEventListener('click', function(e) {
-        const rect = captchaImg.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+      let captchaSolved = false;
+      let winningSymbol = '{{ session.get('winning_symbol', 'X') }}';
+      
+      // Create an overlay grid for cell selection
+      function createOverlayGrid() {
+        tttGrid.innerHTML = '';
+        const imgWidth = captchaImg.clientWidth;
+        const imgHeight = captchaImg.clientHeight;
         
-        // Calculate which cell was clicked
-        const cellSize = captchaImg.width / 3; // Assuming 3x3 grid
-        const col = Math.floor(x / cellSize);
-        const row = Math.floor(y / cellSize);
+        for (let row = 0; row < 3; row++) {
+          for (let col = 0; col < 3; col++) {
+            const cell = document.createElement('div');
+            cell.className = 'ttt-cell';
+            cell.style.width = (imgWidth / 3) + 'px';
+            cell.style.height = (imgHeight / 3) + 'px';
+            cell.style.top = (row * imgHeight / 3) + 'px';
+            cell.style.left = (col * imgWidth / 3) + 'px';
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            
+            cell.addEventListener('click', function() {
+              handleCellClick(row, col, cell);
+            });
+            
+            tttGrid.appendChild(cell);
+          }
+        }
         
-        // Update hidden form inputs
+        // Size the grid container to match the image
+        tttGrid.style.width = imgWidth + 'px';
+        tttGrid.style.height = imgHeight + 'px';
+      }
+      
+      // Function to handle cell click
+      function handleCellClick(row, col, cellElement) {
         rowInput.value = row;
         colInput.value = col;
         
-        // Visual feedback (optional)
-        alert(`Selected cell: row ${row}, column ${col}`);
-      });
+        // Clear any previous selections
+        document.querySelectorAll('.ttt-cell').forEach(cell => {
+          cell.classList.remove('selected', 'correct', 'incorrect');
+          const symbol = cell.querySelector('.ttt-symbol');
+          if (symbol) {
+            symbol.remove();
+          }
+        });
+        
+        // Mark this cell as selected
+        cellElement.classList.add('selected');
+        
+        // Create a symbol element to display in the cell
+        const symbol = document.createElement('span');
+        symbol.className = 'ttt-symbol';
+        symbol.textContent = winningSymbol;  // Use the winning symbol from the session
+        cellElement.appendChild(symbol);
+        
+        // Check if this move is correct using fetch API
+        fetch('/check-move', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ row: row, col: col })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            captchaStatus.textContent = data.message;
+            captchaStatus.className = "captcha-status success";
+            cellElement.classList.add('correct');
+            captchaSolved = true;
+          } else {
+            captchaStatus.textContent = data.message;
+            captchaStatus.className = "captcha-status error";
+            cellElement.classList.add('incorrect');
+            captchaSolved = false;
+            
+            // Remove the symbol if the move is incorrect (optional)
+            // const symbol = cellElement.querySelector('.ttt-symbol');
+            // if (symbol) {
+            //   symbol.remove();
+            // }
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          captchaStatus.textContent = "Error checking move. Please try again.";
+          captchaStatus.className = "captcha-status error";
+        });
+      }
+      
+      // Initialize the grid
+      captchaImg.onload = function() {
+        createOverlayGrid();
+      };
+      createOverlayGrid(); // Also create on initial load
       
       // Refresh the CAPTCHA when button is clicked
       refreshBtn.addEventListener('click', function() {
-        captchaImg.src = '{{ url_for("captcha.get_captcha") }}?' + new Date().getTime();
+        const timestamp = new Date().getTime();
+        captchaImg.src = '{{ url_for("captcha.get_captcha") }}?' + timestamp;
         rowInput.value = '';
         colInput.value = '';
+        captchaStatus.textContent = '';
+        captchaStatus.className = 'captcha-status';
+        captchaSolved = false;
+        
+        // Force a small delay to ensure the session is updated
+        setTimeout(() => {
+          // Reload the page to get the new winning symbol
+          location.reload();
+        }, 500);
       });
+      
+      // Form submission validation
+      registerForm.addEventListener('submit', function(e) {
+        if (!rowInput.value || !colInput.value) {
+          e.preventDefault();
+          captchaStatus.textContent = "Please complete the CAPTCHA before registering.";
+          captchaStatus.className = "captcha-status error";
+        }
+      });
+      
+      // Handle window resize
+      window.addEventListener('resize', createOverlayGrid);
     });
   </script>
-
 
   <style>
     .captcha-box {
@@ -139,32 +244,84 @@
       max-width: 200px;
       height: auto;
       cursor: pointer;
+      display: block;
+      margin: 0 auto;
     }
     
     .ttt-captcha-container {
       display: inline-block;
       position: relative;
+      margin: 0 auto;
+    }
+    
+    .ttt-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: all;
+    }
+    
+    .ttt-cell {
+      position: absolute;
+      cursor: pointer;
+      border: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .ttt-cell:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      border: 1px dashed #333;
+    }
+    
+    .ttt-cell.selected {
+      border: 2px solid #333;
+    }
+    
+    .ttt-cell.correct {
+      background-color: rgba(0, 255, 0, 0.2);
+    }
+    
+    .ttt-cell.incorrect {
+      background-color: rgba(255, 0, 0, 0.2);
+    }
+    
+    .ttt-symbol {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
     }
 
     .captcha-instructions {
-    margin-bottom: 10px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  form input[type="hidden"] {
-    display: none;
-  }
-
-/*     
-    form input[type="text"]#captcha {
-      width: 100%;
-      padding: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #cccccc;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .captcha-status {
+      margin: 10px 0;
+      padding: 5px;
       border-radius: 4px;
-      font-size: 1rem;} */
-  
+      min-height: 24px;
+    }
+    
+    .captcha-status.success {
+      color: green;
+      font-weight: bold;
+    }
+    
+    .captcha-status.error {
+      color: red;
+    }
+    
+    form input[type="hidden"] {
+      display: none;
+    }
   </style>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
