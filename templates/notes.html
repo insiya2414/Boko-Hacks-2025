@@ -19,17 +19,6 @@
         color: #666;
     }
 
-    /* .admin-notice {
-        background: #fffde7;
-        border: 1px solid #fff59d;
-        padding: 0.75rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    } */
-
     .close-notice {
         background: none;
         border: none;
@@ -49,13 +38,6 @@
         margin-bottom: 0.5rem;
     }
 
-    .beta-tag {
-        background: #ffd700;
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: bold;
-    }
 
     .format-hint {
         font-size: 0.8rem;
@@ -156,16 +138,10 @@
         <div class="notes-container">
             <div id="message-area"></div>
             
-            <!-- <div class="admin-notice">
-                hidden
-                <strong>Notice for admin users:</strong> Database maintenance scheduled.
-                <button class="close-notice">×</button>
-            </div> -->
 
             <form id="note-form">
                 <div class="form-header">
                     <span class="form-title">Create New Note</span>
-                    <span class="beta-tag">BETA</span>
                 </div>
                 <input type="text" name="title" id="note-title" placeholder="Enter Title" required>
                 <textarea name="content" id="note-content" placeholder="Enter your bobcat content here. Max characters of 1000" required></textarea>
