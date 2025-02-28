@@ -31,13 +31,6 @@ INTERNAL_NEWS = [
         "publishedAt": "2025-02-01T10:15:00Z",
         "urlToImage": ""
     },
-    {
-        "title": "CONFIDENTIAL: Internal API Credentials",
-        "description": "API_KEY: 5x6hdPQmSK2aT9E3bL8nZ7yRfV4wX1  ADMIN_KEY: jKq2P8zX5sW7vT1yR4aB9nL6cE3hG",
-        "url": "#internal-only",
-        "publishedAt": "2025-01-30T14:45:00Z",
-        "urlToImage": ""
-    }
 ]
 
 @news_bp.route('/')
@@ -51,59 +44,55 @@ def fetch_news():
     try:
         # Get category from request, default to business
         category = request.args.get('category', 'business')
+        if category not in CATEGORY_MAPPING:
+            return jsonify({'success': False, 'error': 'Invalid category'}), 400
         
         # Map our category to API category
-        api_category = CATEGORY_MAPPING.get(category, 'business')
+        api_category = CATEGORY_MAPPING[category]
         api_url = f"{NEWS_API_BASE_URL}/top-headlines/category/{api_category}/{DEFAULT_COUNTRY}.json"
-        
-        print(f"Fetching news from: {api_url}")
         
         # Fetch news from external API
         response = requests.get(api_url, timeout=10)
         
-        if response.status_code == 200:
-            data = response.json()
-            articles = data.get('articles', [])[:10]  # Limit to 10 articles
-            
-            filter_param = request.args.get('filter', '{}')
-            
-            try:
-                filter_options = json.loads(filter_param)
-                print(f"Filter options: {filter_options}")
-                
-                if filter_options.get('showInternal') == True:
-                    # Add internal news to the results
-                    print("Adding internal news to results!")
-                    articles = INTERNAL_NEWS + articles
-            except json.JSONDecodeError:
-                print(f"Invalid filter parameter: {filter_param}")
-            
-            # Transform the data to match our expected format
-            transformed_data = {
-                'success': True,
-                'category': category,
-                'data': []
-            }
-            
-            # Process articles
-            for article in articles:
-                transformed_data['data'].append({
-                    'title': article.get('title', 'No Title'),
-                    'content': article.get('description', 'No content available'),
-                    'date': article.get('publishedAt', ''),
-                    'readMoreUrl': article.get('url', '#'),
-                    'imageUrl': article.get('urlToImage', '')
-                })
-            
-            return jsonify(transformed_data)
-        else:
+        if response.status_code != 200:
             return jsonify({
                 'success': False,
                 'error': f'Failed to fetch news. Status code: {response.status_code}'
             }), response.status_code
+        
+        data = response.json()
+        articles = data.get('articles', [])[:10]
+
+            
+        filter_param = request.args.get('filter', '{}')
+            
+        try:
+            filter_options = json.loads(filter_param)
+        except json.JSONDecodeError:
+            return jsonify({'success': False, 'error': 'Invalid filter parameter'}), 400
+                
+        if filter_options.get('showInternal') is True:
+            articles = INTERNAL_NEWS + articles
+
+        # Transform the data to match expected format
+        transformed_data = {
+            'success': True,
+            'category': category,
+            'data': []
+        }
+
+        # Process articles securely
+        for article in articles:
+            transformed_data['data'].append({
+                'title': article.get('title', 'No Title'),
+                'content': article.get('description', 'No content available'),
+                'date': article.get('publishedAt', ''),
+                'readMoreUrl': article.get('url', '#') if article.get('url', '').startswith("http") else "#",
+                'imageUrl': article.get('urlToImage', '')
+            })
+            
+        return jsonify(transformed_data)
+    except requests.RequestException as e:
+        return jsonify({'success': False, 'error': 'Error fetching news'}), 500
     except Exception as e:
-        print(f"Error fetching news: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
