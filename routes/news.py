@@ -1,44 +1,24 @@
 from flask import Blueprint, render_template, jsonify, request
 import requests
-import json
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 news_bp = Blueprint('news', __name__, url_prefix='/apps/news')
 
 # Base URL for the News API
-NEWS_API_BASE_URL = "https://saurav.tech/NewsAPI"
+NYTIMES_API_KEY = os.getenv("NYTIMES_API_KEY")
+NYTIMES_API_URL = "https://api.nytimes.com/svc/topstories/v2"
 
 # Mapping of our categories to API categories
 CATEGORY_MAPPING = {
     'business': 'business',
     'technology': 'technology',
-    'world': 'general'
+    'world': 'world',
+    'automobile': 'automobiles', 
+    'sports': 'sports',
 }
-
-DEFAULT_COUNTRY = 'us'
-
-INTERNAL_NEWS = [
-    {
-        "title": "CONFIDENTIAL: Security Breach Report Q3",
-        "description": "Details of recent security incidents affecting customer data. For internal review only.",
-        "url": "#internal-only",
-        "publishedAt": "2025-01-15T08:30:00Z",
-        "urlToImage": ""
-    },
-    {
-        "title": "CONFIDENTIAL: Upcoming Product Launch",
-        "description": "Specifications for our next-gen product launch in Q2. Contains proprietary information.",
-        "url": "#internal-only",
-        "publishedAt": "2025-02-01T10:15:00Z",
-        "urlToImage": ""
-    },
-    {
-        "title": "CONFIDENTIAL: Internal API Credentials",
-        "description": "API_KEY: 5x6hdPQmSK2aT9E3bL8nZ7yRfV4wX1  ADMIN_KEY: jKq2P8zX5sW7vT1yR4aB9nL6cE3hG",
-        "url": "#internal-only",
-        "publishedAt": "2025-01-30T14:45:00Z",
-        "urlToImage": ""
-    }
-]
 
 @news_bp.route('/')
 def news_page():
@@ -47,63 +27,58 @@ def news_page():
 
 @news_bp.route('/fetch', methods=['GET'])
 def fetch_news():
-    """Fetch news from the News API with a vulnerability"""
+    """Fetch news from the News API"""
     try:
         # Get category from request, default to business
         category = request.args.get('category', 'business')
+        if category not in CATEGORY_MAPPING:
+            return jsonify({'success': False, 'error': 'Invalid category'}), 400
         
-        # Map our category to API category
-        api_category = CATEGORY_MAPPING.get(category, 'business')
-        api_url = f"{NEWS_API_BASE_URL}/top-headlines/category/{api_category}/{DEFAULT_COUNTRY}.json"
+        api_category = CATEGORY_MAPPING[category]
+
+        if not NYTIMES_API_KEY:
+            return jsonify({'success': False, 'error': 'API key missing'}), 500
         
-        print(f"Fetching news from: {api_url}")
-        
-        # Fetch news from external API
+        api_url = f"{NYTIMES_API_URL}/{api_category}.json?api-key={NYTIMES_API_KEY}"
+
         response = requests.get(api_url, timeout=10)
+
+        if response.status_code != 200:
+            return jsonify({'success': False, 'error': 'Failed to fetch news'}), response.status_code
         
-        if response.status_code == 200:
-            data = response.json()
-            articles = data.get('articles', [])[:10]  # Limit to 10 articles
+        data = response.json()
+        articles = data.get('results', [])[:10]  # Limit to 10 articles
+
+        transformed_data = {
+            'success': True,
+            'category': category,
+            'data': []
+        }
+
+        # Process articles securely
+        for article in articles:
+            summary = article.get('abstract', 'No summary available')
+            url = article.get('url', "https://www.nytimes.com")
+
+            # Get first available image
+            image_url = "https://via.placeholder.com/150"
+            multimedia = article.get('multimedia', [])
+            if multimedia and isinstance(multimedia, list):
+                for media in multimedia:
+                    if media.get('url'):
+                        image_url = media['url']
+                        break  # Use first available image
+
+            transformed_data['data'].append({
+                'title': article.get('title', 'No Title'),
+                'content': summary,
+                'date': article.get('published_date', ''),
+                'readMoreUrl': url,
+                'imageUrl': image_url
+            })
             
-            filter_param = request.args.get('filter', '{}')
-            
-            try:
-                filter_options = json.loads(filter_param)
-                print(f"Filter options: {filter_options}")
-                
-                if filter_options.get('showInternal') == True:
-                    # Add internal news to the results
-                    print("Adding internal news to results!")
-                    articles = INTERNAL_NEWS + articles
-            except json.JSONDecodeError:
-                print(f"Invalid filter parameter: {filter_param}")
-            
-            # Transform the data to match our expected format
-            transformed_data = {
-                'success': True,
-                'category': category,
-                'data': []
-            }
-            
-            # Process articles
-            for article in articles:
-                transformed_data['data'].append({
-                    'title': article.get('title', 'No Title'),
-                    'content': article.get('description', 'No content available'),
-                    'date': article.get('publishedAt', ''),
-                    'readMoreUrl': article.get('url', '#'),
-                    'imageUrl': article.get('urlToImage', '')
-                })
-            
-            return jsonify(transformed_data)
-        else:
-            return jsonify({
-                'success': False,
-                'error': f'Failed to fetch news. Status code: {response.status_code}'
-            }), response.status_code
+        return jsonify(transformed_data)
+    except requests.RequestException:
+        return jsonify({'success': False, 'error': 'Error fetching news'}), 500
     except Exception as e:
-        print(f"Error fetching news: {e}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+        return jsonify({'success': False, 'error': str(e)}), 500

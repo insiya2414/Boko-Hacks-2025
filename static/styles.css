@@ -405,17 +405,35 @@ a.btn:hover {
   border: 1px solid #cccccc;
   border-radius: 4px;
   font-size: 1rem;
-  padding-right: 40px; /* Make space for the eye icon */
+  padding-right: 40px; /* Space for the eye icon */
 }
 
 .toggle-password {
   position: absolute;
   right: 10px;
   cursor: pointer;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: var(--gray-dark);
+  transition: transform 0.3s ease-in-out, color 0.3s;
 }
 
 .toggle-password:hover {
   color: var(--maroon);
+}
+
+/* Rotate effect when toggling */
+.eye-animate {
+  animation: rotateEye 0.3s ease-in-out;
+}
+
+@keyframes rotateEye {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
